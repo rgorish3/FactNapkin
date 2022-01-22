@@ -35,16 +35,27 @@ async def on_message(message):
         cursor.execute(sql, (msgServer,))
         result = cursor.fetchone()
 
-        authorSplit = result[1].split('#')
-        authorUser = discord.utils.get(message.guild.members, name = authorSplit[0], discriminator= authorSplit[1])
 
-        await message.channel.send(f'`{result[0]}`\n\n-submitted by {authorUser.mention}')
-       
+        if not result:
+            await message.channel.send('No facts have been added. Use the add command to add some.')
+        else:
+            authorSplit = result[1].split('#')
+            authorUser = discord.utils.get(message.guild.members, name = authorSplit[0], discriminator= authorSplit[1])
+
+            await message.channel.send(f'`{result[0]}`\n\n-submitted by {authorUser.mention}')
+        
     if msgFull.lower().startswith('&about'):
-        await message.channel.send('FactNapkin is a bot that will dispense random facts that may or may not be true.')
+        await message.channel.send('FactNapkin is a bot that will dispense random facts of potentially dubious accuracy.')
     
     if msgFull.lower().startswith('&help'):
-        await message.channel.send('COMMANDS:\n----------------\n**fact** - Returns a random fact.\n**add** - Add a fact\n**about** - Information about FactNapkin.')
+
+        commands= 'COMMANDS:\n----------------\n'
+        commands+='**fact** - Returns a random fact.\n'
+        commands+='**add** - Add a fact.\n'
+        commands+='**list** - Lists all facts user has added.\n'
+        commands+='**delete** - Delete a fact you added (use number shown by list command)\n'
+        commands+='**about** - Information about FactNapkin.'
+        await message.channel.send(commands)
 
     if msgFull.lower().startswith('&add'):
 
@@ -69,9 +80,13 @@ async def on_message(message):
 
         i=1
         outputStr =  message.author.mention + "'s facts\n```"
-        for fact in result:
-            outputStr += str(i) + '. ' + fact[0] + '\n'
-            i += 1
+        
+        if not result:
+            outputStr += 'You have added no facts! Get to adding!'
+        else:
+            for fact in result:
+                outputStr += str(i) + '. ' + fact[0] + '\n'
+                i += 1
 
         outputStr += '```'
         
@@ -91,8 +106,8 @@ async def on_message(message):
         if msg.isdigit():
             msgInt = int(msg)
             if msgInt > 0 and msgInt <= count:
-                sql = ('DELETE FROM Facts WHERE FactID = (SELECT FactID FROM (SELECT FactID FROM Facts WHERE Name=%s ORDER BY FactID LIMIT 1 OFFSET %i) AS tbl)')
-                cursor.execute(sql,(msgAuthor,),(msgInt,))
+                sql = ('DELETE FROM Facts WHERE FactID = (SELECT FactID FROM (SELECT FactID FROM Facts WHERE Name=%s ORDER BY FactID LIMIT 1 OFFSET %s) AS tbl)')
+                cursor.execute(sql,(msgAuthor, msgInt-1))
                 db.commit()
 
                 await message.channel.send('Fact deleted!')
