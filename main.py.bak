@@ -141,8 +141,8 @@ async def on_message(message):
         if msg.isdigit():
             msgInt = int(msg)
             if msgInt > 0 and msgInt <= count:
-                sql = ('DELETE FROM Facts WHERE FactID = (SELECT FactID FROM (SELECT FactID FROM Facts WHERE Name=%s AND Server=%s ORDER BY FactID LIMIT 1 OFFSET %s) AS tbl)')
-                cursor.execute(sql,(msgAuthor,msgServer, msgInt-1))
+                sql = ('DELETE FROM Facts WHERE FactID = (SELECT FactID FROM (SELECT FactID FROM Facts WHERE Name=%s ORDER BY FactID LIMIT 1 OFFSET %s) AS tbl)')
+                cursor.execute(sql,(msgAuthor, msgInt-1))
                 db.commit()
 
                 await message.channel.send('Fact deleted!')
