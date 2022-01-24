@@ -82,15 +82,50 @@ async def on_message(message):
         outputStr =  message.author.mention + "'s facts\n```"
         
         if not result:
-            outputStr += 'You have added no facts! Get to adding!'
+            outputStr += 'You have added no facts! Get to adding!```'
+            await message.channel.send(outputStr)
         else:
             for fact in result:
-                outputStr += str(i) + '. ' + fact[0] + '\n'
+                outputStr += str(i) + '. ' + fact[0] + '\n\n'
                 i += 1
-
-        outputStr += '```'
         
-        await message.channel.send(outputStr)
+            brokenUpOutput = []
+            firstRun = True
+            markdown = ''
+
+
+            while len(outputStr) > 0:                                                              #This loop will populate brokenUpOutput which is a list that breaks up]
+                                                                                                    #   outputStr into approximately 1800 character chunks. Discord has a
+                                                                                                    #   character limit of 2000. There are three possibilities that I am
+                                                                                                    #   accounting for. Less than 1800 characters, where I just place the whole
+                                                                                                    #   string in the list and end the loop. Greater than 1800 characters and there 
+                                                                                                    #   is a space character after the 1800 index. I split the string at that space
+                                                                                                    #   and place the first part into the list and rerun the loop with the remaining
+                                                                                                    #   part. Finally, Greater than 1800 characters and there is a no space character
+                                                                                                    #   after the 1800 index. I split it at the 1800 mark and put the rest back in
+                                                                                                    #   outputStr. Considered recursive function to do this, elected not to as
+                                                                                                    #   this code will never be reused elsewhere.
+                if(len(outputStr)>=1800):                                                          
+                    spaceIndex = outputStr.find(' ',1800)                                       
+                    if spaceIndex >= 0:
+                        brokenUpOutput.append(markdown + outputStr[0:spaceIndex] + '```')
+                        outputStr = outputStr[spaceIndex+1:len(outputStr)]
+                    
+                    else:
+                        brokenUpOutput.append(markdown + outputStr[0:1800] + '```')
+                        outputStr = outputStr[1800:len(outputStr)]
+                else:
+                    brokenUpOutput.append(markdown + outputStr + '```')
+                    outputStr = ''
+                
+                if(firstRun):
+                    markdown='```'
+                    firstRun=False
+
+            for output in brokenUpOutput:
+                
+                await message.channel.send(output)
+     
 
     if msgFull.lower().startswith('&delete'):
 
