@@ -154,4 +154,4 @@ async def on_message(message):
 
 client.run(os.getenv("DISCORD_TOKEN"))
 
-db.close()
+#db.close()
