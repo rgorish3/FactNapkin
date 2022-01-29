@@ -1,7 +1,7 @@
 import discord
 import os
 
-from database import cursor, db
+from database import cursor, db, connect
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -24,12 +24,17 @@ async def on_message(message):
         return
     
 
+    
+
+
     msgFull = message.content
     msgAuthor = message.author.name + '#' + message.author.discriminator
     msgServer = message.guild.name
 
 
     if msgFull.lower().startswith('&fact'):
+
+        connect()
         
         sql = ('SELECT Fact, Name FROM Facts WHERE Server=%s ORDER BY RAND() LIMIT 1')
         cursor.execute(sql, (msgServer,))
@@ -59,6 +64,8 @@ async def on_message(message):
 
     if msgFull.lower().startswith('&add'):
 
+        connect()
+
         msg = msgFull
         msg = msg[4:]
         msg = msg.strip()
@@ -72,6 +79,8 @@ async def on_message(message):
             await message.channel.send('Fact added!')
     
     if msgFull.lower().startswith('&list'):
+
+        connect()
 
         sql = ('SELECT Fact FROM Facts WHERE Server = %s AND Name = %s')
         cursor.execute(sql,(msgServer,msgAuthor))
@@ -126,8 +135,9 @@ async def on_message(message):
                 
                 await message.channel.send(output)
      
-
     if msgFull.lower().startswith('&delete'):
+        
+        connect()
 
         msg = msgFull
         msg = msg[7:]
