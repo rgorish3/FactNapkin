@@ -15,7 +15,9 @@ cursor = db.cursor()
 
 
 
-def connect():
+def connect():                                                  #This is a terrible way to do this.
+                                                                #   Will adjust later, probably with return statement
+                                                                #   instead of a 'void' method
     global db
     db=mysql.connector.connect(user=os.getenv("DB_USER"), 
     password=os.getenv("DB_PASSWORD"),
