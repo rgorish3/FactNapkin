@@ -1,5 +1,6 @@
 import discord
 import os
+import time
 
 from database import cursor, db, connect
 
@@ -20,8 +21,7 @@ async def on_ready():
 async def on_message(message):
 
     
-    if message.author == client.user:
-        return
+    if message.author == client.user:        return
     
 
     
@@ -33,6 +33,10 @@ async def on_message(message):
 
 
     if msgFull.lower().startswith('&fact'):
+
+        ts = time.time()
+        print(f'Fact Start: {ts}')
+
 
         connect()
         
@@ -48,6 +52,11 @@ async def on_message(message):
             authorUser = discord.utils.get(message.guild.members, name = authorSplit[0], discriminator= authorSplit[1])
 
             await message.channel.send(f'`{result[0]}`\n\n-submitted by {authorUser.mention}')
+
+        
+        ts = time.time()
+        print(f'Fact End: {ts}')
+
         
     if msgFull.lower().startswith('&about'):
         await message.channel.send('FactNapkin is a bot that will dispense random facts of potentially dubious accuracy.')
@@ -64,6 +73,10 @@ async def on_message(message):
 
     if msgFull.lower().startswith('&add'):
 
+
+        ts = time.time()
+        print(f'Add Start: {ts}')
+
         connect()
 
         msg = msgFull
@@ -77,9 +90,15 @@ async def on_message(message):
             cursor.execute(sql,(msg, msgAuthor, msgServer))
             db.commit()
             await message.channel.send('Fact added!')
+
+        ts = time.time()
+        print(f'Add End: {ts}')
+
     
     if msgFull.lower().startswith('&list'):
-
+        ts = time.time()
+        print(f'List Start: {ts}')
+        
         connect()
 
         sql = ('SELECT Fact FROM Facts WHERE Server = %s AND Name = %s')
@@ -134,9 +153,14 @@ async def on_message(message):
             for output in brokenUpOutput:
                 
                 await message.channel.send(output)
+        ts = time.time()
+        print(f'List End: {ts}')
      
     if msgFull.lower().startswith('&delete'):
         
+        ts = time.time()
+        print(f'Delete Start: {ts}')
+
         connect()
 
         msg = msgFull
@@ -160,6 +184,9 @@ async def on_message(message):
                 await message.channel.send('Invalid Selection')
         else:
             await message.channel.send('Selection Must Be A Number')
+        
+        ts = time.time()
+        print(f'Delete End: {ts}')
 
 
 client.run(os.getenv("DISCORD_TOKEN"))
