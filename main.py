@@ -38,7 +38,7 @@ async def on_message(message):
         print(f'Fact Start: {ts}')
 
 
-        connect()
+        # connect()
         
         sql = ('SELECT Fact, Name FROM Facts WHERE Server=%s ORDER BY RAND() LIMIT 1')
         cursor.execute(sql, (msgServer,))
@@ -77,7 +77,7 @@ async def on_message(message):
         ts = time.time()
         print(f'Add Start: {ts}')
 
-        connect()
+        # connect()
 
         msg = msgFull
         msg = msg[4:]
@@ -99,7 +99,7 @@ async def on_message(message):
         ts = time.time()
         print(f'List Start: {ts}')
         
-        connect()
+        # connect()
 
         sql = ('SELECT Fact FROM Facts WHERE Server = %s AND Name = %s')
         cursor.execute(sql,(msgServer,msgAuthor))
@@ -161,7 +161,7 @@ async def on_message(message):
         ts = time.time()
         print(f'Delete Start: {ts}')
 
-        connect()
+        # connect()
 
         msg = msgFull
         msg = msg[7:]
