@@ -1,11 +1,19 @@
+
+import mysql.connector
+from mysql.connector import Error
+from mysql.connector import errorcode
+
 import discord
 import os
 import time
 
-from database import cursor, db, connect
+# from database import cursor, db, connect
 
 from dotenv import load_dotenv
 load_dotenv()
+
+
+
 
 intents = discord.Intents.default()                                 #Sets up the intent which allows the bot to see the other users in the server
 intents.members = True                                              #
@@ -38,7 +46,15 @@ async def on_message(message):
         print(f'Fact Start: {ts}')
 
 
-        # connect()
+        db = mysql.connector.connect(user=os.getenv("DB_USER"), 
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_DATABASE")
+        )
+        print('Connected to Database')
+
+        cursor = db.cursor()
+ 
         
         sql = ('SELECT Fact, Name FROM Facts WHERE Server=%s ORDER BY RAND() LIMIT 1')
         cursor.execute(sql, (msgServer,))
@@ -56,6 +72,11 @@ async def on_message(message):
         
         ts = time.time()
         print(f'Fact End: {ts}')
+
+        db.close()
+        print('Disconnected from Database')
+
+
 
         
     if msgFull.lower().startswith('&about'):
@@ -77,7 +98,14 @@ async def on_message(message):
         ts = time.time()
         print(f'Add Start: {ts}')
 
-        # connect()
+        db = mysql.connector.connect(user=os.getenv("DB_USER"), 
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_DATABASE")
+        )
+        print('Connected to Database')
+
+        cursor = db.cursor()
 
         msg = msgFull
         msg = msg[4:]
@@ -94,12 +122,22 @@ async def on_message(message):
         ts = time.time()
         print(f'Add End: {ts}')
 
+        db.close()
+        print('Disconnected from database')
+
     
     if msgFull.lower().startswith('&list'):
         ts = time.time()
         print(f'List Start: {ts}')
         
-        # connect()
+        db = mysql.connector.connect(user=os.getenv("DB_USER"), 
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_DATABASE")
+        )
+        print('Connected to Database')
+
+        cursor = db.cursor()
 
         sql = ('SELECT Fact FROM Facts WHERE Server = %s AND Name = %s')
         cursor.execute(sql,(msgServer,msgAuthor))
@@ -155,13 +193,23 @@ async def on_message(message):
                 await message.channel.send(output)
         ts = time.time()
         print(f'List End: {ts}')
+
+        db.close()
+        print('Disconnected from database')
      
     if msgFull.lower().startswith('&delete'):
         
         ts = time.time()
         print(f'Delete Start: {ts}')
 
-        # connect()
+        db = mysql.connector.connect(user=os.getenv("DB_USER"), 
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_DATABASE")
+        )
+        print('Connected to Database')
+
+        cursor = db.cursor()
 
         msg = msgFull
         msg = msg[7:]
@@ -188,7 +236,9 @@ async def on_message(message):
         ts = time.time()
         print(f'Delete End: {ts}')
 
+        db.close()
+        print('Disconnected from database')
+
 
 client.run(os.getenv("DISCORD_TOKEN"))
 
-#db.close()
